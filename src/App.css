@@ -7,10 +7,18 @@
 }
 
 button{
-  background-color: orange;
-  border: none;
+  background-color: rgb(153, 179, 236);
+  border-color: rgb(41, 98, 219);
+  cursor: pointer;
+  text-transform: uppercase;
+  width: 7%;
+  height: 4%;
 }
 
-span{
-  background-color: darkgrey;
+button:hover {
+  background-color: #487ce6;
+}
+
+button:active {
+  background-color: #ffffff;
 }
