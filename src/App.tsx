@@ -1,54 +1,55 @@
-
 import { useState } from 'react'
 import axios from 'axios';
+
+import CircularProgress from '@mui/material/CircularProgress';
+import { Error as Alert } from './components';
+
 import './App.css'
 
-interface IApp {
-  count: number,
-  loading: boolean,
-  err: string,
-  disabled: boolean,
-}
-
-const App: React.FC<IApp> = ({ }) => {
+const App = () => {
   const [count, setCount] = useState(0);
   const [serverCount, setServerCount] = useState(0);
+  const [timeoutId, setTimeoutId] = useState<number | null>(null);
   const [loading, setLoading] = useState(false);
-  const [err, setErr] = useState('');
+  const [err, setErr] = useState<string | null>(null);
+
   const url = 'https://lk.zont-online.ru/api';
 
+  const onCounter = () => {
+    setCount(prev => prev + 1);
+    if (timeoutId) {
+      clearTimeout(timeoutId);
+      setTimeoutId(null);
+    }
+    const timeoutIdCurrent = setTimeout(() => fetchButtonCount(count + 1), 1000);
+    setTimeoutId(timeoutIdCurrent);
+  }
 
-  const countHandler = async () => {
-    // const timer = null
-    const newCount = serverCount + 1
-    setServerCount((serverCount) => serverCount + 1)
-    setLoading(true);
+  const fetchButtonCount = async (count: number) => {
     try {
-      setCount((count) => count + 1);
+      setLoading(true);
       const res = await axios(`${url}/button_count`, {
         method: 'POST',
         headers: { 'X-ZONT-Client': 'semenusachev10@gmail.com' },
-        data: { count: newCount },
+        data: { count },
       });
-      console.log(res);
-
-    } catch (err: any) {
-      console.log(err)
-
-      setErr(err)
+      const resServerCount = res.data?.count;
+      setServerCount(resServerCount);
+    }
+    catch (err: any) {
+      setErr(err?.message)
     }
     finally {
       setLoading(false);
     }
-
   }
 
   return (
     <div className="container">
-      {err && <h2>{err}</h2>}
-      <button disabled={loading} onClick={countHandler}>кликнуть</button>
+      {err && (<Alert variant="outlined" severity="error" alertText={err}> </Alert>)}
+      <button disabled={loading} onClick={onCounter}>кликнуть</button>
       <span>Кликнули {count} раз</span>
-      {loading && <h2>Loading...</h2>}<span>По версии сервера: {serverCount} раз</span>
+      {loading && <CircularProgress />}<span>По версии сервера: {serverCount} раз</span>
     </div>
   )
 }
