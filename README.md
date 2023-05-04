@@ -1,1 +1,2 @@
-# microline-click-button
+# mcrln-click-button
+yarn dev - start project
